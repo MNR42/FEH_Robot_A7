@@ -69,10 +69,10 @@
        while((TimeNow()-start_time)<time)
        {
 
-       backrightVex.SetPercent(percent);
-       backleftVex.SetPercent(-1*percent);
-       frontrightVex.SetPercent(percent);
-       frontleftVex.SetPercent(-1*percent);
+       backrightVex.SetPercent(-1*percent);
+       backleftVex.SetPercent(percent);
+       frontrightVex.SetPercent(-1*percent);
+       frontleftVex.SetPercent(percent);
        }
        backrightVex.Stop();
        backleftVex.Stop();
@@ -87,10 +87,10 @@
        while((TimeNow()-start_time)<time)
        {
 
-           backrightVex.SetPercent(-1*percent);
-           backleftVex.SetPercent(percent);
-           frontrightVex.SetPercent(-1*percent);
-           frontleftVex.SetPercent(percent);
+           backrightVex.SetPercent(percent);
+           backleftVex.SetPercent(-1*percent);
+           frontrightVex.SetPercent(percent);
+           frontleftVex.SetPercent(-1*percent);
            }
            backrightVex.Stop();
            backleftVex.Stop();
@@ -136,6 +136,18 @@
        frontrightVex.Stop();
        frontleftVex.Stop();
        backleftVex.Stop();
+   }
+
+   void MoveDiagonalBackRight (int percent, double time){
+       double start_time=TimeNow();
+       while((TimeNow()-start_time)<time)
+       {
+           frontrightVex.SetPercent(percent);
+           backleftVex.SetPercent(-1*percent);
+
+           }
+           frontrightVex.Stop();
+           backleftVex.Stop();
    }
 
    void FollowLine(double distance)
@@ -200,35 +212,36 @@
 
    }
 
-  /* void PT1()
+   void PT1()
    {
-    Forward(30,3);
-    MoveLeft(30, 2);
-    Forward(30,2);
-    Reverse(30,1);
-    MoveRight(30,6);
-    Forward(30,3);
-    MoveLeft(30,3);
-    MoveRight(30,3);
-    Reverse(30,8);
-   }*/
+    MoveRight(30, 2);
+    Reverse(30, 1);
+    MoveDiagonalBackRight(30, 4.5);
+    MoveRight(30, 1.0);
+    Forward(30, 1.2);
+    MoveLeft(30, 3.2);
+    Forward(30, 5.0);
+    MoveRight(30, 1.0);
+    MoveLeft(30, 1.0);
+    Forward(30, 1.5);
+    MoveLeft(50, 3.6);
+   }
 
 int main(void)
 {
-
-
-
-
-
-    /*
+    int x=5;
+    while(x==5)
+    {
     if(CdS_cell.Value()>.2 && CdS_cell.Value()<.6)
     {
+     LCD.WriteLine(CdS_cell.Value());
      LCD.WriteLine("!!!");
-     FlipJack();
+     PT1();
     }
 
+    }
 
-
+/*
     float x,y;
 
     LCD.Clear( FEHLCD::Black );
