@@ -227,8 +227,14 @@
     MoveLeft(50, 3.6);
    }
 
+   void PT2()
+   {
+    Forward(30, 2);
+   }
+
 int main(void)
 {
+    //PT2();
     int x=5;
     while(x==5)
     {
@@ -241,7 +247,7 @@ int main(void)
 
     }
 
-/*
+    /*
     float x,y;
 
     LCD.Clear( FEHLCD::Black );
