@@ -214,8 +214,8 @@
 
    void PT1()
    {
-    MoveRight(30, 2);
-    Reverse(30, 1);
+    MoveRight(30, 2.0);
+    Reverse(30, 1.0);
     MoveDiagonalBackRight(30, 4.5);
     MoveRight(30, 1.0);
     Forward(30, 1.2);
