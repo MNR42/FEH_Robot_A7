@@ -30,7 +30,7 @@
 
    //Turning fuctions
 
-   void turnRight()
+   void turnRight90()
    {
 
        double start_time=TimeNow();
@@ -49,7 +49,43 @@
        frontleftVex.Stop();
    }
 
-   void turnLeft()
+   void turnLeft90()
+   {
+       double start_time=TimeNow();
+       while((TimeNow()-start_time)<2)
+       {
+       frontleftVex.SetPercent(-30);
+       frontrightVex.SetPercent(-30);
+       backrightVex.SetPercent(-30);
+       backleftVex.SetPercent(-30);
+
+       }
+       frontleftVex.Stop();
+       backrightVex.Stop();
+       frontrightVex.Stop();
+       backleftVex.Stop();
+   }
+
+   void turnRight(double time)
+   {
+
+       double start_time=TimeNow();
+       while((TimeNow()-start_time)<time)
+       {
+
+       frontrightVex.SetPercent(30);
+       backrightVex.SetPercent(30);
+       frontleftVex.SetPercent(30);
+       backleftVex.SetPercent(30);
+
+       }
+       frontrightVex.Stop();
+       backleftVex.Stop();
+       backleftVex.Stop();
+       frontleftVex.Stop();
+   }
+
+   void turnLeft(double time)
    {
        double start_time=TimeNow();
        while((TimeNow()-start_time)<2)
@@ -302,7 +338,7 @@
     Reverse(30,1.2);
     MoveRight(30,3.22);
     Forward(30,2.9);
-    turnLeft();
+    turnLeft90();
     Forward(25,1.2);
     Reverse(25,1.2);
     MoveLeft(80,5.6);
@@ -333,6 +369,10 @@
        Forward(30,1);
        Reverse(30, .5);
        MoveRight(30, 5.5);
+       MoveLeft(30, .5);
+       turnRight(.3);
+       MoveLeft(30, 1.5);
+       Reverse(30, 3.0);
    }
 
    void ReadValue(){
