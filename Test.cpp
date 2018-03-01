@@ -27,6 +27,9 @@
    AnalogInputPin middleopto(FEHIO::P2_1);
    AnalogInputPin leftopto(FEHIO::P2_2);
 
+
+   //Turning fuctions
+
    void turnRight()
    {
 
@@ -62,6 +65,8 @@
        frontrightVex.Stop();
        backleftVex.Stop();
    }
+
+   //Move in straight line functions
 
    void Forward(int percent, double time)
    {
@@ -138,6 +143,25 @@
        backleftVex.Stop();
    }
 
+   //Overloaded move in straight line fuctions
+
+   void Forward(int percent)
+      {
+          double start_time=TimeNow();
+
+          backrightVex.SetPercent(percent);
+          backleftVex.SetPercent(-1*percent);
+          frontrightVex.SetPercent(percent);
+          frontleftVex.SetPercent(-1*percent);
+
+          backrightVex.Stop();
+          backleftVex.Stop();
+          frontrightVex.Stop();
+          frontleftVex.Stop();
+      }
+
+   //Digonal Functions
+
    void MoveDiagonalFrontRight (int percent, double time){
        double start_time=TimeNow();
        while((TimeNow()-start_time)<time)
@@ -186,51 +210,88 @@
            backleftVex.Stop();
    }
 
-   void FollowLine(double distance)
-   {
-       bool online;
-         int x=5,position;
+   //Overloaded Digonal functions
 
-         while(x==5)
-         {
+   void MoveDiagonalFrontLeft (int percent){
+             double start_time=TimeNow();
 
-             if(leftopto.Value()>.8 && leftopto.Value()<1.2)
-             {
-                 position=1;
-             }
+                 frontrightVex.SetPercent(-1*percent);
+                 backleftVex.SetPercent(percent);
 
-             else if(rightopto.Value()>.8 && rightopto.Value()<1.2)
-             {
-                 position=3;
-             }
-             else if(middleopto.Value()>.8 && middleopto.Value()<1.2)
-             {
-                 position=2;
-             }
+                 frontrightVex.Stop();
+                 backleftVex.Stop();
+         }
 
-             switch(position)
-             {
-                 case(1):
-                     frontrightVex.SetPercent(30);
-                     frontleftVex.SetPercent(15);
-                 break;
-                 case(2):
-                     frontrightVex.SetPercent(15);
-                     frontleftVex.SetPercent(30);
-                 break;
-                 case(3):
-                     frontrightVex.SetPercent(30);
-                     frontleftVex.SetPercent(30);
-                 break;
-             default:
-                 LCD.WriteLine("???");
+   void MoveDiagonalFrontRight (int percent){
+             double start_time=TimeNow();
 
-             }
+                 frontleftVex.SetPercent(percent);
+                 backrightVex.SetPercent(-1*percent);
 
 
+                 frontrightVex.Stop();
+                 backleftVex.Stop();
+         }
+
+   //Line Following
+
+   void FollowLine(int time)
+      {
+            bool online;
+            int x=5,position;
+            double start_time=TimeNow();
+
+            while(x==5)
+            {
+
+                if(leftopto.Value()>0 && leftopto.Value()<2)
+                {
+                    position=1;
+                }
+
+                else if(rightopto.Value()>0 && rightopto.Value()<2)
+                {
+                    position=3;
+                }
+                else if(middleopto.Value()>0 && middleopto.Value()<2)
+                {
+                    position=2;
+                }
+
+                switch(position)
+                {
+                    case(1):
+                       MoveDiagonalFrontLeft(25);
+                    break;
+                    case(2):
+                       MoveDiagonalFrontRight(25);
+                    break;
+                    case(3):
+                       Forward(10);
+                    break;
+                default:
+                    LCD.WriteLine("???");
+
+                }
+                if(TimeNow() - start_time >= time){
+                    x=6;
+                }
+            }
+      }
+
+   //Read Light and move accoordingly function
+   void ReadLight(){
+       LCD.WriteLine(CdS_cell.Value());
+       if (CdS_cell.Value() <1) {
+           MoveRight(30, .6);
+       } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) {
+           MoveLeft(30, .6);
+       } else {
+           LCD.WriteLine("???");
+       }
    }
-   }
 
+   //Test Functions
    void FlipJack()
    {
 
@@ -265,9 +326,21 @@
 
    void PT2()
    {
-    Forward(30, 2);
-    MoveLeft(30, 1.5);
+       Forward(30, 2.0);
+       MoveLeft(30, 2.1);
+       LCD.WriteLine(CdS_cell.Value());
+       ReadLight();
+       Forward(30,1);
+       Reverse(30, .5);
+       MoveRight(30, 5.5);
+   }
 
+   void ReadValue(){
+       int x=5;
+       while(x==5){
+       LCD.WriteLine(CdS_cell.Value());
+       Sleep(1.0);
+       }
    }
 
 int main(void)
@@ -280,7 +353,8 @@ int main(void)
     {
      LCD.WriteLine(CdS_cell.Value());
      LCD.WriteLine("!!!");
-     PT1();
+     PT2();
+     x=6;
     }
 
     }
