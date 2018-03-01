@@ -138,12 +138,48 @@
        backleftVex.Stop();
    }
 
+   void MoveDiagonalFrontRight (int percent, double time){
+       double start_time=TimeNow();
+       while((TimeNow()-start_time)<time)
+       {
+           frontleftVex.SetPercent(percent);
+           backrightVex.SetPercent(-1*percent);
+
+           }
+           frontrightVex.Stop();
+           backleftVex.Stop();
+   }
+
+   void MoveDiagonalFrontLeft (int percent, double time){
+       double start_time=TimeNow();
+       while((TimeNow()-start_time)<time)
+       {
+           frontrightVex.SetPercent(-1*percent);
+           backleftVex.SetPercent(percent);
+
+           }
+           frontrightVex.Stop();
+           backleftVex.Stop();
+   }
+
    void MoveDiagonalBackRight (int percent, double time){
        double start_time=TimeNow();
        while((TimeNow()-start_time)<time)
        {
            frontrightVex.SetPercent(percent);
            backleftVex.SetPercent(-1*percent);
+
+           }
+           frontrightVex.Stop();
+           backleftVex.Stop();
+   }
+
+   void MoveDiagonalBackLeft (int percent, double time){
+       double start_time=TimeNow();
+       while((TimeNow()-start_time)<time)
+       {
+           frontleftVex.SetPercent(-1*percent);
+           backrightVex.SetPercent(percent);
 
            }
            frontrightVex.Stop();
@@ -175,16 +211,16 @@
              switch(position)
              {
                  case(1):
-                     frontrightVex.SetPercent(15);
-                     frontleftVex.SetPercent(5);
+                     frontrightVex.SetPercent(30);
+                     frontleftVex.SetPercent(15);
                  break;
                  case(2):
-                     frontrightVex.SetPercent(5);
-                     frontleftVex.SetPercent(15);
+                     frontrightVex.SetPercent(15);
+                     frontleftVex.SetPercent(30);
                  break;
                  case(3):
-                     frontrightVex.SetPercent(15);
-                     frontleftVex.SetPercent(15);
+                     frontrightVex.SetPercent(30);
+                     frontleftVex.SetPercent(30);
                  break;
              default:
                  LCD.WriteLine("???");
@@ -230,6 +266,8 @@
    void PT2()
    {
     Forward(30, 2);
+    MoveLeft(30, 1.5);
+
    }
 
 int main(void)
@@ -246,29 +284,5 @@ int main(void)
     }
 
     }
-
-    /*
-    float x,y;
-
-    LCD.Clear( FEHLCD::Black );
-    LCD.SetFontColor( FEHLCD::White );
-
-   while( true )
-    {
-        if( LCD.Touch(&x,&y) )
-        {
-           LCD.WriteLine("....................../´¯/");
-           LCD.WriteLine("....................,/¯../");
-           LCD.WriteLine(") .................../..../");
-           LCD.WriteLine(") ............./´¯/'...'/´¯¯`·¸
-            ........../'/.../..../......./¨¯\
-            ........('(...´...´.... ¯~/'...')
-            .........\.................'...../
-            ..........''...\.......... _.·´
-            ............\..............(
-            ..............\.............\...
-            Sleep( 100 );
-        }
-    }*/
     return 0;
 }
