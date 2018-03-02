@@ -316,15 +316,19 @@
       }
 
    //Read Light and move accoordingly function
-   void ReadLight(){
+   int ReadLight(){
+       int color;
        LCD.WriteLine(CdS_cell.Value());
        if (CdS_cell.Value() <1) {
            MoveRight(30, .6);
+           color = 0;
        } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) {
            MoveLeft(30, .6);
+           color = 1;
        } else {
            LCD.WriteLine("???");
        }
+       return color;
    }
 
    //Test Functions
@@ -365,14 +369,28 @@
        Forward(30, 2.0);
        MoveLeft(30, 2.1);
        LCD.WriteLine(CdS_cell.Value());
-       ReadLight();
+       int x = ReadLight();
+       if (x==0) {
+           LCD.WriteLine("This is red MAX");
+       } else if (x==1){
+           LCD.WriteLine("This is blue MAX");
+       }
        Forward(30,1);
        Reverse(30, .5);
        MoveRight(30, 5.5);
-       MoveLeft(30, .5);
-       turnRight(.3);
-       MoveLeft(30, 1.5);
-       Reverse(30, 3.0);
+       if (x == 0) {
+           MoveLeft(30, .5);
+           Forward(30, .3);
+           MoveRight(30, .75);
+           MoveLeft(30, .5);
+           turnRight(.25);
+           MoveLeft(30, 1.85);
+       } else {
+           MoveLeft(30, .5);
+           turnRight(.3);
+           MoveLeft(30, 1.5);
+       }
+       Reverse(30, 6);
    }
 
    void ReadValue(){
