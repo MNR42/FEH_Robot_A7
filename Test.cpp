@@ -39,7 +39,7 @@
    {
 
        double start_time=TimeNow();
-       while((TimeNow()-start_time)<2.3)
+       while((TimeNow()-start_time)<2.2)
        {
 
        frontrightVex.SetPercent(30);
@@ -57,7 +57,7 @@
    void turnLeft90()
    {
        double start_time=TimeNow();
-       while((TimeNow()-start_time)<2.3)
+       while((TimeNow()-start_time)<2.2)
        {
        frontleftVex.SetPercent(-30);
        frontrightVex.SetPercent(-30);
@@ -86,14 +86,14 @@
        }
        frontrightVex.Stop();
        backleftVex.Stop();
-       backleftVex.Stop();
+       backrightVex.Stop();
        frontleftVex.Stop();
    }
 
    void turnLeft(double time)
    {
        double start_time=TimeNow();
-       while((TimeNow()-start_time)<2)
+       while((TimeNow()-start_time)<time)
        {
        frontleftVex.SetPercent(-30);
        frontrightVex.SetPercent(-30);
@@ -320,7 +320,7 @@
                     LCD.WriteLine("???");
 
                 }
-                if(TimeNow() - start_time <= time){
+                if(TimeNow() - start_time >= time){
                     x=6;
                     LCD.WriteLine("End Line following");
                 }
@@ -397,17 +397,36 @@
        servo.SetMax(max);
        servo.SetDegree(180);
 
-       Forward(30, 2.0);
+       Forward(30, 1.75);
        turnLeft90();
        MoveDiagonalBackRight(30, 1.9);
-       Reverse(30, 1.2);
+       Reverse(30, .7);
        //FollowLine(.4);
-       servo.SetDegree(75);
-       Sleep(2.0);
+       servo.SetDegree(80);
+       Reverse(20, .5);
+       Sleep(1.0);
        servo.SetDegree(110);
        Forward(30, .5);
        turnRight90();
-       LCD.WriteLine("END");
+       Reverse(30, .6);
+       MoveDiagonalBackRight(30, 2.0);
+       MoveLeft(30, .2);
+       Reverse(80, 2.0);
+       turnRight(.7);
+       MoveDiagonalBackRight(40, 1.5);
+       turnLeft(.5);
+       MoveRight(30, 2.0);
+       MoveDiagonalBackLeft(30, 4.5);
+       turnLeft(.5);
+       Reverse(30, 3.5);
+       servo.SetDegree(75);
+       Forward(30, .8);
+       servo.SetDegree(180);
+       MoveLeft(30, 2.0);
+       MoveDiagonalFrontLeft(30, 2.0);
+       MoveLeft(30, 1.0)
+
+       LCD.WriteLine("END :)");
 
    }
 
