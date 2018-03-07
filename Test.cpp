@@ -9,32 +9,37 @@
 #include <FEHMotor.h>
 #include <FEHServo.h>
 
+   /*
+    * Initialize motors, sensors, and servos
+    */
    AnalogInputPin CdS_cell(FEHIO::P0_0);
    DigitalInputPin frontright(FEHIO::P1_0);
    DigitalInputPin frontleft(FEHIO::P1_2);
    DigitalInputPin backright(FEHIO::P0_0);
    DigitalInputPin backleft(FEHIO::P1_3);
 
-   FEHServo servo1(FEHServo::Servo0);
-   FEHServo servo2(FEHServo::Servo1);
+   FEHServo servo(FEHServo::Servo0);
+    #define min 500
+    #define max 2432
 
-   FEHMotor frontrightVex (FEHMotor::Motor0,7.2);
-   FEHMotor frontleftVex (FEHMotor::Motor1,7.2);
-   FEHMotor backrightVex (FEHMotor::Motor2,7.2);
-   FEHMotor backleftVex (FEHMotor::Motor3,7.2);
+   FEHMotor frontrightVex (FEHMotor::Motor3,7.2);
+   FEHMotor frontleftVex (FEHMotor::Motor2,7.2);
+   FEHMotor backrightVex (FEHMotor::Motor1,7.2);
+   FEHMotor backleftVex (FEHMotor::Motor0,7.2);
 
    AnalogInputPin rightopto(FEHIO::P2_0);
    AnalogInputPin middleopto(FEHIO::P2_1);
    AnalogInputPin leftopto(FEHIO::P2_2);
 
 
-   //Turning fuctions
-
+   /*
+    * Turning fuctions
+    */
    void turnRight90()
    {
 
        double start_time=TimeNow();
-       while((TimeNow()-start_time)<2)
+       while((TimeNow()-start_time)<2.3)
        {
 
        frontrightVex.SetPercent(30);
@@ -45,14 +50,14 @@
        }
        frontrightVex.Stop();
        backleftVex.Stop();
-       backleftVex.Stop();
+       backrightVex.Stop();
        frontleftVex.Stop();
    }
 
    void turnLeft90()
    {
        double start_time=TimeNow();
-       while((TimeNow()-start_time)<2)
+       while((TimeNow()-start_time)<2.3)
        {
        frontleftVex.SetPercent(-30);
        frontrightVex.SetPercent(-30);
@@ -60,9 +65,9 @@
        backleftVex.SetPercent(-30);
 
        }
+       frontrightVex.Stop();
        frontleftVex.Stop();
        backrightVex.Stop();
-       frontrightVex.Stop();
        backleftVex.Stop();
    }
 
@@ -102,8 +107,9 @@
        backleftVex.Stop();
    }
 
-   //Move in straight line functions
-
+   /*
+    * Move in straight line functions
+    */
    void Forward(int percent, double time)
    {
        double start_time=TimeNow();
@@ -179,8 +185,9 @@
        backleftVex.Stop();
    }
 
-   //Overloaded move in straight line fuctions
-
+   /*
+    *Overloaded move in straight line fuctions
+    */
    void Forward(int percent)
       {
           double start_time=TimeNow();
@@ -196,8 +203,9 @@
           frontleftVex.Stop();
       }
 
-   //Digonal Functions
-
+   /*
+    * Digonal Functions
+    */
    void MoveDiagonalFrontRight (int percent, double time){
        double start_time=TimeNow();
        while((TimeNow()-start_time)<time)
@@ -246,8 +254,9 @@
            backleftVex.Stop();
    }
 
-   //Overloaded Digonal functions
-
+   /*
+    *Overloaded Digonal functions
+    */
    void MoveDiagonalFrontLeft (int percent){
              double start_time=TimeNow();
 
@@ -269,8 +278,9 @@
                  backleftVex.Stop();
          }
 
-   //Line Following
-
+   /*
+    * Line Following
+    */
    void FollowLine(int time)
       {
             bool online;
@@ -280,6 +290,7 @@
             while(x==5)
             {
 
+                LCD.WriteLine("Begin Line following");
                 if(leftopto.Value()>0 && leftopto.Value()<2)
                 {
                     position=1;
@@ -309,46 +320,34 @@
                     LCD.WriteLine("???");
 
                 }
-                if(TimeNow() - start_time >= time){
+                if(TimeNow() - start_time <= time){
                     x=6;
+                    LCD.WriteLine("End Line following");
                 }
             }
       }
 
-   //Read Light and move accoordingly function
+   /*
+    * Read Light and move accoordingly function
+    */
    int ReadLight(){
        int color;
        LCD.WriteLine(CdS_cell.Value());
-       if (CdS_cell.Value() <1) {
+       if (CdS_cell.Value() <1) {  //Red Light
            MoveRight(30, .6);
            color = 0;
-       } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) {
+       } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) { //Blue light
            MoveLeft(30, .6);
            color = 1;
        } else {
            LCD.WriteLine("???");
        }
-       return color;
+       return color; //0 = red ; 1 = blue
    }
 
-   //Test Functions
-   void FlipJack()
-   {
-
-
-    Forward(30,.545);
-    MoveLeft(30,1.22);
-    Forward(30,1.2);
-    Reverse(30,1.2);
-    MoveRight(30,3.22);
-    Forward(30,2.9);
-    turnLeft90();
-    Forward(25,1.2);
-    Reverse(25,1.2);
-    MoveLeft(80,5.6);
-
-   }
-
+   /*
+    * Preformance test Functions
+    */
    void PT1()
    {
     MoveRight(30, 2.0);
@@ -393,6 +392,28 @@
        Reverse(30, 6);
    }
 
+   void PT3() {
+       servo.SetMin(min);
+       servo.SetMax(max);
+       servo.SetDegree(180);
+
+       Forward(30, 2.0);
+       turnLeft90();
+       MoveDiagonalBackRight(30, 1.9);
+       Reverse(30, 1.2);
+       //FollowLine(.4);
+       servo.SetDegree(75);
+       Sleep(2.0);
+       servo.SetDegree(110);
+       Forward(30, .5);
+       turnRight90();
+       LCD.WriteLine("END");
+
+   }
+
+   /*
+    * Debugging functions
+    */
    void ReadValue(){
        int x=5;
        while(x==5){
@@ -403,7 +424,7 @@
 
 int main(void)
 {
-    //PT2();
+    //PT3();
     int x=5;
     while(x==5)
     {
@@ -411,7 +432,7 @@ int main(void)
     {
      LCD.WriteLine(CdS_cell.Value());
      LCD.WriteLine("!!!");
-     PT2();
+     PT3();
      x=6;
     }
 
