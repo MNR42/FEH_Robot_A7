@@ -13,10 +13,6 @@
     * Initialize motors, sensors, and servos
     */
    AnalogInputPin CdS_cell(FEHIO::P0_0);
-   DigitalInputPin frontright(FEHIO::P1_0);
-   DigitalInputPin frontleft(FEHIO::P1_2);
-   DigitalInputPin backright(FEHIO::P0_0);
-   DigitalInputPin backleft(FEHIO::P1_3);
 
    FEHServo servo(FEHServo::Servo0);
     #define min 500
@@ -27,9 +23,11 @@
    FEHMotor backrightVex (FEHMotor::Motor1,7.2);
    FEHMotor backleftVex (FEHMotor::Motor0,7.2);
 
-   AnalogInputPin rightopto(FEHIO::P2_0);
-   AnalogInputPin middleopto(FEHIO::P2_1);
-   AnalogInputPin leftopto(FEHIO::P2_2);
+   AnalogInputPin rightopto(FEHIO::P1_0);
+   AnalogInputPin middleopto(FEHIO::P1_2);
+   AnalogInputPin leftopto(FEHIO::P1_4);
+
+   DigitalInputPin microswitch_arm(FEHIO::P2_0);
 
 
    /*
@@ -327,6 +325,27 @@
             }
       }
 
+   void FindLine() {
+       while (middleopto.Value() >= .4){
+           MoveRight(20, .1);
+       }
+       MoveRight(30, .3);
+   }
+
+   /*
+    * Pick up wrench
+    */
+   void PickUpWrench() {
+       servo.SetDegree(82);
+       while (microswitch_arm.Value() == 1){
+           Reverse(20, .1);
+       }
+       servo.SetDegree(77);
+       Sleep(1.0);
+       servo.SetDegree(110);
+
+   }
+
    /*
     * Read Light and move accoordingly function
     */
@@ -393,40 +412,57 @@
    }
 
    void PT3() {
+       //Initailize servo
        servo.SetMin(min);
        servo.SetMax(max);
        servo.SetDegree(180);
 
+       //Get to the left of line
        Forward(30, 1.75);
        turnLeft90();
-       MoveDiagonalBackRight(30, 1.9);
-       Reverse(30, .7);
-       //FollowLine(.4);
-       servo.SetDegree(80);
-       Reverse(20, .5);
-       Sleep(1.0);
-       servo.SetDegree(110);
+       Reverse(30, 1.0);
+
+       //Find line
+       MoveRight(30, 1.0);
+
+       //Pick up Wrench
+       PickUpWrench();
        Forward(30, .5);
        turnRight90();
+
+       //Get up slope
        Reverse(30, .6);
        MoveDiagonalBackRight(30, 2.0);
        MoveLeft(30, .2);
-       Reverse(80, 2.0);
-       turnRight(.7);
+       Reverse(70, 2.5);
+       turnRight(1.2);
        MoveDiagonalBackRight(40, 1.5);
        turnLeft(.5);
        MoveRight(30, 2.0);
-       MoveDiagonalBackLeft(30, 4.5);
-       turnLeft(.5);
-       Reverse(30, 3.5);
-       servo.SetDegree(75);
+
+       //Get to Garage
+       MoveDiagonalBackLeft(30, 7.0);
+       turnLeft(1.2);
+
+       //Drop off Wrench
+       servo.SetDegree(100);
+       Reverse(30, 4.0);
+       if (microswitch_arm.Value() == 0){
+           servo.SetDegree(75);
+       }
        Forward(30, .8);
        servo.SetDegree(180);
+
+       //Hit the crank
        MoveLeft(30, 2.0);
-       MoveDiagonalFrontLeft(30, 2.0);
-       MoveLeft(30, 1.0)
+       MoveDiagonalFrontLeft(30, 3.0);
+       MoveLeft(30, 1.0);
 
        LCD.WriteLine("END :)");
+
+   }
+
+   void PT4 () {
 
    }
 
