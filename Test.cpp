@@ -8,6 +8,7 @@
 #include <FEHUtility.h>
 #include <FEHMotor.h>
 #include <FEHServo.h>
+#include <FEHRPS.h>
 
    /*
     * Initialize motors, sensors, and servos
@@ -29,6 +30,18 @@
 
    DigitalInputPin microswitch_arm(FEHIO::P2_0);
 
+   /*
+    * Initialize RPS
+    */
+   void InitializeTouchMenu();
+   void InitializeMenu();
+   float X();
+   float Y();
+   float Heading();
+   int Time();
+   unsigned char CurrentCourse();
+   char CurrentRegionLetter();
+   int CurrentRegion();
 
    /*
     * Turning fuctions
@@ -463,7 +476,32 @@
    }
 
    void PT4 () {
+       //Move to hill
 
+       //Go up hill
+
+       //Move to crank
+
+       //Choose position
+
+       //Move accordingly
+
+       //Go back to lower level
+   }
+
+   /*
+    * Position function
+    */
+   void StartRPSPoition () {
+       boolean check = true;
+       int correctX;
+       int correctY;
+
+       while (check) {
+           LCD.WriteLine("Correct position:")
+           LCD.WriteLine(correctX);
+           LCd.WriteLine(correctY);
+       }
    }
 
    /*
@@ -477,9 +515,22 @@
        }
    }
 
+
+
 int main(void)
 {
-    //PT3();
+    //initialize the RPS
+    RPS.InitializeTouchMenu();
+
+    //Get the X coordinate of the robot every 1/2 second
+    while(true)
+    {
+        // get the current course number and display it to the screen
+        LCD.WriteLine( RPS.CurrentCourse() );
+        Sleep( 0.5 );
+    }
+
+    //Call function when Robot sees the light
     int x=5;
     while(x==5)
     {
