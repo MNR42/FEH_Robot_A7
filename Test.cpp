@@ -493,14 +493,41 @@
     * Position function
     */
    void StartRPSPoition () {
-       boolean check = true;
-       int correctX;
-       int correctY;
+       bool check = true;
+       double correctX = 16.9;
+       double correctY = 28.6;
+       double correctD = 90;
+
+       LCD.WriteLine("Correct position:");
+       LCD.WriteLine(correctX);
+       LCD.WriteLine(correctY);
+       LCD.WriteLine("-------------");
+       while (check) {
+           LCD.WriteRC(RPS.X(), 2, 12);
+           LCD.WriteRC(RPS.Y(), 3, 12);
+           LCD.WriteRC(RPS.Heading(), 4, 12);
+           if (RPS.X() < (correctX + 1) && RPS.X() > (correctX - 1)) {
+               if (RPS.Y() < (correctY + 1) && RPS.Y() > (correctY - 1)) {
+                   if (RPS.Heading() < (correctD + 1) && RPS.Heading() > (correctD - 1)) {
+                       LCD.WriteLine("The robot is in the correct position :)");
+                       check = false;
+                   }
+               }
+           }
+           Sleep(3.0);
+       }
+   }
+
+   void checkRPSPoition (int correctX, int correctY) {
+       bool check = true;
 
        while (check) {
-           LCD.WriteLine("Correct position:")
+           LCD.WriteLine("Correct position:");
            LCD.WriteLine(correctX);
-           LCd.WriteLine(correctY);
+           LCD.WriteLine(correctY);
+           if (RPS.X() < correctX + .2 ) {
+               LCD.WriteLine("InCorrect position");
+           }
        }
    }
 
