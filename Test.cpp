@@ -502,13 +502,14 @@
        LCD.WriteLine(correctX);
        LCD.WriteLine(correctY);
        LCD.WriteLine("-------------");
+
        while (check) {
            LCD.WriteRC(RPS.X(), 2, 12);
            LCD.WriteRC(RPS.Y(), 3, 12);
            LCD.WriteRC(RPS.Heading(), 4, 12);
-           if (RPS.X() < (correctX + 1) && RPS.X() > (correctX - 1)) {
-               if (RPS.Y() < (correctY + 1) && RPS.Y() > (correctY - 1)) {
-                   if (RPS.Heading() < (correctD + 1) && RPS.Heading() > (correctD - 1)) {
+           if (RPS.X() < (correctX + .2) && RPS.X() > (correctX - .2)) {
+               if (RPS.Y() < (correctY + .2) && RPS.Y() > (correctY - .2)) {
+                   if (RPS.Heading() < (correctD + .2) && RPS.Heading() > (correctD - .2)) {
                        LCD.WriteLine("The robot is in the correct position :)");
                        check = false;
                    }
@@ -549,13 +550,7 @@ int main(void)
     //initialize the RPS
     RPS.InitializeTouchMenu();
 
-    //Get the X coordinate of the robot every 1/2 second
-    while(true)
-    {
-        // get the current course number and display it to the screen
-        LCD.WriteLine( RPS.CurrentCourse() );
-        Sleep( 0.5 );
-    }
+    StartRPSPoition();
 
     //Call function when Robot sees the light
     int x=5;
