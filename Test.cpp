@@ -360,6 +360,35 @@
    }
 
    /*
+    * Pick up wrench
+    */
+   void SpinWheel() {
+       int fuel = RPS.FuelType(); //1 clockwise, 2 counter-clockwise
+       int i = 0;
+
+       //Turn crank
+       if (fuel == 1){
+           MoveLeft(30, .5);
+           for (i = 0; i < 70; i+10) {
+               servo.SetDegree(i);
+               Sleep(.2);
+           }
+           MoveRight(30, .2);
+           Forward(30, .5);
+       } else if (fuel == 2) {
+           MoveRight(30, .5);
+           for (i = 0; i < 70; i+10) {
+               servo.SetDegree(i);
+               Sleep(.2);
+           }
+           MoveLeft(30, .2);
+           Forward(30, .5);
+       }
+
+   }
+
+
+   /*
     * Read Light and move accoordingly function
     */
    int ReadLight(){
@@ -519,17 +548,161 @@
        }
    }
 
-   void checkRPSPoition (int correctX, int correctY) {
-       bool check = true;
+   //Note* This function does not take into account feild elements
+   void checkRPSPoition (double correctX, double correctY, double correctD) {
+       bool checkX = false;
+       bool checkY = false;
+       bool checkD = false;
+       double time = 2.0;
+       double start_time = 0;
 
-       while (check) {
-           LCD.WriteLine("Correct position:");
-           LCD.WriteLine(correctX);
-           LCD.WriteLine(correctY);
-           if (RPS.X() < correctX + .2 ) {
-               LCD.WriteLine("InCorrect position");
+       LCD.WriteLine("Correct position:");
+       LCD.WriteLine(correctX);
+       LCD.WriteLine(correctY);
+       LCD.WriteLine(correctD);
+
+
+       //Heading
+       while(!((RPS.Heading() < (correctD + .5)) && (RPS.Heading() > (correctD - .5))) &&
+             !((RPS.X() < (correctX + .1)) && (RPS.X() > (correctX - .1))) &&
+             !((RPS.Y() < (correctY + .1)) && (RPS.Y() > (correctY - .1)))
+             ) {
+           if (RPS.Heading() < correctD) {
+               start_time = TimeNow();
+               while (RPS.Heading() < correctD || (TimeNow()-start_time)<time) {
+                   turnLeft(.1);
+               }
+           }
+           if (RPS.Heading() > correctD || (TimeNow()-start_time)<time) {
+               start_time = TimeNow();
+               while (RPS.Heading() > correctD) {
+                   turnRight(.1);
+               }
+           }
+       LCD.WriteLine("Correct Heading Found");
+
+       //Fix X and Y if facing 0 degrees
+       if(RPS.Heading() < 1 && RPS.Heading() > 359){
+           if (RPS.X() < (correctX + .1)) {
+               while (RPS.X() < (correctX + .1)) {
+                   MoveRight(20, .1);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.X() > (correctX + .1)) {
+               while (RPS.X() > (correctX + .1)) {
+                   MoveLeft(20, .1);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.Y() < (correctY - .1)) {
+               while (RPS.X() < (correctY + .1)) {
+                   Reverse(20, .1);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.Y() > (correctY - .1)) {
+               while (RPS.X() > (correctY + .1)) {
+                   Forward(20, .1);
+                   Sleep(.5);
+               }
            }
        }
+
+       //Fix X and Y if facing 90 degrees
+       if(RPS.Heading() < 91 && RPS.Heading() > 89){
+           LCD.WriteLine("Heading 90 degrees");
+           if (RPS.X() < (correctX + .1)) {
+               start_time = TimeNow();
+               while (RPS.X() < correctX || (TimeNow()-start_time)<time) {
+                   Forward(20, .1);
+                   LCD.WriteRC(RPS.X(), 2, 12);
+                   LCD.WriteRC(RPS.Y(), 3, 12);
+               }
+           }
+           if (RPS.X() > correctX) {
+               start_time = TimeNow();
+               while (RPS.X() > correctX || (TimeNow()-start_time)<time) {
+                   Reverse(20, .1);
+                   LCD.WriteRC(RPS.X(), 2, 12);
+                   LCD.WriteRC(RPS.Y(), 3, 12);
+               }
+           }
+           if (RPS.Y() < correctY) {
+               start_time = TimeNow();
+               while (RPS.Y() < (correctY + .1)  || (TimeNow()-start_time)<time) {
+                   MoveLeft(20, .1);
+                   LCD.WriteRC(RPS.X(), 2, 12);
+                   LCD.WriteRC(RPS.Y(), 3, 12);
+               }
+           }
+           if (RPS.Y() > correctY) {
+               start_time = TimeNow();
+               while (RPS.Y() > correctY  || (TimeNow()-start_time)<time) {
+                   MoveRight(20, .1);
+                   LCD.WriteRC(RPS.X(), 2, 12);
+                   LCD.WriteRC(RPS.Y(), 3, 12);
+               }
+           }
+       }
+
+       //Fix X and Y if facing 180 degrees
+       if(RPS.Heading() < 179 && RPS.Heading() > 181) {
+           if (RPS.X() < (correctX + .1)) {
+               while (RPS.X() < (correctX + .1)) {
+                   MoveLeft(20, .01);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.X() > (correctX + .1)) {
+               while (RPS.X() > (correctX + .1)) {
+                   MoveRight(20, .01);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.Y() < (correctY - .1)) {
+               while (RPS.X() < (correctY + .1)) {
+                   Forward(20, .01);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.Y() > (correctY - .1)) {
+               while (RPS.X() > (correctY + .1)) {
+                   Reverse(20, .01);
+                   Sleep(.5);
+               }
+           }
+       }
+
+       //Fix X and Y if facing 270 degrees
+       if(RPS.Heading() < 271 && RPS.Heading() > 269) {
+           if (RPS.X() < (correctX + .1)) {
+               while (RPS.X() < (correctX + .1)) {
+                   Reverse(20, .01);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.X() > (correctX + .1)) {
+               while (RPS.X() > (correctX + .1)) {
+                   Forward(20, .01);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.Y() < (correctY - .1)) {
+               while (RPS.X() < (correctY + .1)) {
+                   MoveRight(20, .01);
+                   Sleep(.5);
+               }
+           }
+           if (RPS.Y() > (correctY - .1)) {
+               while (RPS.X() > (correctY + .1)) {
+                   MoveLeft(20, .01);
+                   Sleep(.5);
+               }
+           }
+       }
+   }
+       LCD.WriteLine("Finished");
    }
 
    /*
@@ -550,7 +723,8 @@ int main(void)
     //initialize the RPS
     RPS.InitializeTouchMenu();
 
-    StartRPSPoition();
+    checkRPSPoition(16.9, 28.6, 90);
+    //StartRPSPoition ();
 
     //Call function when Robot sees the light
     int x=5;
