@@ -343,7 +343,9 @@
             MoveRight(30, .7);
             Forward(30, 1.2);
             Reverse(30, .6);
-            MoveLeft(30, .6);
+            MoveLeft(30, 1.6);
+            MoveRight(30, .7);
+            Forward(30, .2);
         } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) { //Blue light
             LCD.WriteLine("Light is BLUE");
             MoveLeft(30, .6);
@@ -453,12 +455,16 @@
 
             //Get to Garage
             Reverse(30, 2.4);
-            turnLeft(1.3);
+            turnLeft(1.2);
+            servo.SetDegree(180);
             MoveLeft(30, 1.5);
+            Reverse(30, 1.5);
+            Forward(30, .4);
             FindLineGarage();
             MoveRight(30, .3);
 
             //Drop off Wrench
+            servo.SetDegree(110);
             while(microswitch_arm.Value() == 0){
                 servo.SetDegree(100);
                 Reverse(30, 1.5);
@@ -473,7 +479,7 @@
             //Move to crank
             Forward(40, 1.1);
             turnRight90();
-            Reverse(20, 2.2);
+            Reverse(30, 2.8);
 
             //Turn crank
             SpinWheel();
@@ -482,10 +488,10 @@
             Forward(30, 1.2);
             turnRight90();
             Reverse(30, 4.0);
-            turnRight(1.0);
+            turnRight(1.2);
             MoveRight(30, .6);
-            Reverse(30, 1.5);
-            MoveRight(30, .6);
+            Reverse(30, 3.0);
+            MoveRight(30, 1.0);
             MoveLeft(30, 2.8);
             Forward(30, 2.0);
 
