@@ -285,6 +285,42 @@
           }
 
 /*
+ * Check RPS
+ */
+    void CheckRPS(double correctD) {
+        //Initialize variables
+        double time = 4.0;
+        double start_time = 0;
+
+        //Print correct direction/position
+        LCD.Clear();
+        LCD.WriteLine("Correct position: (x, y, angle)");
+        //LCD.WriteLine(correctX);
+        //LCD.WriteLine(correctY);
+        LCD.WriteLine(correctD);
+
+        //Check direction
+        if (RPS.Heading() < correctD) {
+            start_time = TimeNow();
+            while (RPS.Heading() < correctD || (TimeNow()-start_time)<time) {
+                turnLeft(.3);
+                Sleep(0.4);
+            }
+        }
+        if (RPS.Heading() > correctD || (TimeNow()-start_time)<time) {
+            start_time = TimeNow();
+            while (RPS.Heading() > correctD) {
+                turnRight(.3);
+                Sleep(0.4);
+            }
+        }
+
+        //Check X
+
+        //Check Y
+    }
+
+/*
  * Pick up wrench
  */
     void PickUpWrench() {
@@ -294,7 +330,7 @@
         }
         servo.SetDegree(77);
         Sleep(1.0);
-        servo.SetDegree(135);
+        servo.SetDegree(180);
 
     }
 
@@ -309,23 +345,21 @@
 
        //Turn crank
        if (fuel == 1){
-           MoveLeft(20, .8);
+           MoveLeft(20, .6);
            servo.SetDegree(i);
            Sleep(.5);
            MoveRight(20, .6);
            servo.SetDegree(i2);
            Sleep(.5);
-           MoveRight(20, 1.0);
+           MoveRight(20, 1.2);
            Forward(30, 1.4);
        } else if (fuel == 2) {
-           MoveRight(20, 1.2);
-           // (i = 0; i < 70; i+10) {
-               servo.SetDegree(i);
-               Sleep(.2);
-           //}
+           MoveRight(20, 1.1);
+           servo.SetDegree(i);
+           Sleep(.2);
            MoveLeft(20, .6);
            servo.SetDegree(i2);
-           MoveLeft(20, 1.0);
+           MoveLeft(20, 1.2);
            Forward(30, 1.4);
        }
        servo.SetDegree(180);
@@ -341,21 +375,24 @@
         if (CdS_cell.Value() <1) {  //Red Light
             LCD.WriteLine("Light is RED");
             MoveRight(30, .7);
-            Forward(30, 1.2);
+            Forward(30, .7);
             Reverse(30, .6);
-            MoveLeft(30, 1.6);
-            MoveRight(30, .7);
-            Forward(30, .2);
+            MoveLeft(30, 2.4);
+            MoveRight(30, .8);
+            Forward(30, .3);
         } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) { //Blue light
             LCD.WriteLine("Light is BLUE");
             MoveLeft(30, .6);
-            Forward(30, 1.2);
+            Forward(30, 1.0);
             Reverse(30, .6);
-            MoveLeft(30, .8);
-            MoveRight(30, .7);
-            Forward(30, .2);
+            MoveLeft(26, .9);
+            MoveRight(30, .8);
+            Forward(30, .3);
         } else {
             LCD.WriteLine("Button Light not Read");
+            MoveLeft(30, 1.6);
+            MoveRight(30, .7);
+            Forward(30, .2);
         }
     }
 
@@ -367,6 +404,10 @@
          double correctX = 17.2;
          double correctY = 28.6;
          double correctD = 90;
+
+         if(RPS.CurrentRegion() == 6) {
+             correctY = 28.0;
+         }
 
          LCD.WriteLine("Correct position:");
          LCD.WriteLine(correctX);
@@ -392,13 +433,7 @@
 /*
  * Find Line Function
  */
-    void FindLineWrench() {
-        while (opto.Value() <= 3.0){
-            MoveLeft(20, .2);
-        }
-    }
-
-    void FindLineGarage() {
+    void FindLine() {
         while (opto.Value() <= 3.0){
             MoveLeft(20, .2);
         }
@@ -412,29 +447,32 @@
         LCD.Clear();
 
         //Get to the button, read the button light,
-            Forward(30, 1.8);
-            MoveLeft(30, 2.2);
+            Forward(26, 2.1);
+            //CheckRPS(90);
+            MoveLeft(30, 1.8);
+            Sleep(0.5);
             PushButton();
 
         //Get to and flip the car jack
-            MoveRight(30, 2.2);
+            MoveRight(30, 2.1);
             turnLeft90();
             MoveRight(30, .3);
+            Reverse(30, .2);
             MoveDiagonalBackRight(40, 4.3);
             MoveRight(30, 1.0);
-            Reverse(30, 1.0);
+            Reverse(26, .6);
             MoveRight(30, .3);
             MoveLeft(30, .2);
-            Forward(30, 1.8);
+            Forward(30, 1.6);
             Reverse(30, .3);
-            MoveRight(30, .3);
+            MoveRight(30, .5);
 
         //Move to and pick up wrench
             MoveLeft(30, 1.0);
             MoveDiagonalFrontLeft(30, 1.0);
-            FindLineWrench();
+            FindLine();
             Forward(20, .7);
-            MoveRight(10, .6);
+            MoveRight(15, .5);
             PickUpWrench();
 
         //Move to garage and deposite wrench
@@ -446,9 +484,9 @@
             Reverse(70, 2.0);
             MoveLeft(30, 1.0);
             MoveRight(30, .3);
-            Reverse(70, .8);
+            Reverse(50, 1.0);
             turnRight(1.1);
-            MoveDiagonalBackRight(40, 3.0);
+            MoveDiagonalBackRight(40, 2.0);
             turnLeft(.8);
             MoveRight(30, 1.0);
             MoveLeft(30, .5);
@@ -456,15 +494,17 @@
             //Get to Garage
             Reverse(30, 2.4);
             turnLeft(1.2);
-            servo.SetDegree(180);
             MoveLeft(30, 1.5);
             Reverse(30, 1.5);
             Forward(30, .4);
-            FindLineGarage();
+            FindLine();
             MoveRight(30, .3);
 
             //Drop off Wrench
             servo.SetDegree(110);
+            servo.SetDegree(100);
+            Reverse(30, 1.5);
+            servo.SetDegree(75);
             while(microswitch_arm.Value() == 0){
                 servo.SetDegree(100);
                 Reverse(30, 1.5);
@@ -475,25 +515,34 @@
             }
             servo.SetDegree(180);
 
+        //Realign with the line
+            Forward(30, .2);
+            MoveRight(30, .5);
+            FindLine();
+            Reverse(30, .4);
+
         //Move to and turn crank
             //Move to crank
-            Forward(40, 1.1);
-            turnRight90();
-            Reverse(30, 2.8);
+            Forward(40, .6);
+            turnRight(2.2);
+            MoveLeft(30, 0.9);
+            Reverse(30, 2.4);
 
             //Turn crank
             SpinWheel();
 
         //Move to and push final button
-            Forward(30, 1.2);
+            Forward(30, 1.4);
             turnRight90();
-            Reverse(30, 4.0);
+            Reverse(30, 3.8);
             turnRight(1.2);
             MoveRight(30, .6);
-            Reverse(30, 3.0);
-            MoveRight(30, 1.0);
+            MoveLeft(30, .2);
+            Reverse(30, 4.5);
+            MoveRight(30, 2.0);
+            Forward(30, .2);
             MoveLeft(30, 2.8);
-            Forward(30, 2.0);
+            Forward(30, 8.0);
 
     }
 
