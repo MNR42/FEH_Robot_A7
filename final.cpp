@@ -326,7 +326,7 @@
     void PickUpWrench() {
         servo.SetDegree(80);
         while (microswitch_arm.Value() == 1){
-            Reverse(20, .1);
+            Reverse(15, .1);
         }
         servo.SetDegree(77);
         Sleep(1.0);
@@ -340,26 +340,25 @@
    void SpinWheel() {
        int fuel = RPS.FuelType(); //1 clockwise, 2 counter-clockwise
        int i = 65;
-       int i2 = 55;
+       int i2 = 50;
 
 
        //Turn crank
        if (fuel == 1){
-           MoveLeft(20, .6);
-           servo.SetDegree(i);
-           Sleep(.5);
+           MoveLeft(20, 1.2);
+           //servo.SetDegree(i);
+           //Sleep(.5);
            MoveRight(20, .6);
            servo.SetDegree(i2);
-           Sleep(.5);
-           MoveRight(20, 1.2);
+           MoveRight(20, 2.0);
            Forward(30, 1.4);
        } else if (fuel == 2) {
-           MoveRight(20, 1.1);
-           servo.SetDegree(i);
-           Sleep(.2);
+           MoveRight(20, 1.5);
+           //servo.SetDegree(i);
+           //Sleep(.5);
            MoveLeft(20, .6);
            servo.SetDegree(i2);
-           MoveLeft(20, 1.2);
+           MoveLeft(20, 2.0);
            Forward(30, 1.4);
        }
        servo.SetDegree(180);
@@ -380,14 +379,14 @@
             MoveLeft(30, 2.4);
             MoveRight(30, .8);
             Forward(30, .3);
-        } else if(CdS_cell.Value()>1 && CdS_cell.Value()<2.5) { //Blue light
+        } else if(CdS_cell.Value()>1 && CdS_cell.Value()<3.3) { //Blue light
             LCD.WriteLine("Light is BLUE");
             MoveLeft(30, .6);
             Forward(30, 1.0);
             Reverse(30, .6);
             MoveLeft(26, .9);
             MoveRight(30, .8);
-            Forward(30, .3);
+            Forward(30, .2);
         } else {
             LCD.WriteLine("Button Light not Read");
             MoveLeft(30, 1.6);
@@ -450,7 +449,7 @@
             Forward(26, 2.1);
             //CheckRPS(90);
             MoveLeft(30, 1.8);
-            Sleep(0.5);
+            Sleep(1.5);
             PushButton();
 
         //Get to and flip the car jack
@@ -469,9 +468,9 @@
 
         //Move to and pick up wrench
             MoveLeft(30, 1.0);
-            MoveDiagonalFrontLeft(30, 1.0);
+            MoveDiagonalFrontLeft(30, .8);
             FindLine();
-            Forward(20, .7);
+            Forward(20, .9);
             MoveRight(15, .5);
             PickUpWrench();
 
@@ -484,9 +483,9 @@
             Reverse(70, 2.0);
             MoveLeft(30, 1.0);
             MoveRight(30, .3);
-            Reverse(50, 1.0);
+            Reverse(60, 1.0);
             turnRight(1.1);
-            MoveDiagonalBackRight(40, 2.0);
+            MoveDiagonalBackRight(40, 2.2);
             turnLeft(.8);
             MoveRight(30, 1.0);
             MoveLeft(30, .5);
@@ -525,8 +524,8 @@
             //Move to crank
             Forward(40, .6);
             turnRight(2.2);
-            MoveLeft(30, 0.9);
-            Reverse(30, 2.4);
+            MoveLeft(30, 1.0);
+            Reverse(30, 2.2);
 
             //Turn crank
             SpinWheel();
@@ -536,10 +535,10 @@
             turnRight90();
             Reverse(30, 3.8);
             turnRight(1.2);
-            MoveRight(30, .6);
+            MoveRight(30, 1.5);
             MoveLeft(30, .2);
             Reverse(30, 4.5);
-            MoveRight(30, 2.0);
+            MoveRight(30, 1.5);
             Forward(30, .2);
             MoveLeft(30, 2.8);
             Forward(30, 8.0);
