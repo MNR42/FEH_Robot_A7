@@ -4,6 +4,7 @@
 #include <FEHMotor.h>
 #include <FEHServo.h>
 #include <FEHRPS.h>
+#include <FEHBattery.h>
 #include <time.h>
 
 
@@ -209,6 +210,28 @@
            frontleftVex.Stop();
        }
 
+    void MoveLeft(int percent)
+    {
+        /*
+        math for driving sideways
+        */
+        double time = .2;
+        double start_time=TimeNow();
+        while((TimeNow()-start_time)<time)
+        {
+            frontleftVex.SetPercent(-1*percent);
+            frontrightVex.SetPercent(-1*percent);
+            backrightVex.SetPercent(percent);
+            backleftVex.SetPercent(percent);
+        }
+
+            frontleftVex.Stop();
+            backrightVex.Stop();
+            frontrightVex.Stop();
+            backleftVex.Stop();
+
+    }
+
 /*
  * Digonal Functions
  */
@@ -287,45 +310,32 @@
 /*
  * Check RPS
  */
-    void CheckRPS(double correctD) {
+    void CheckRPS() {
         //Initialize variables
         double time = 4.0;
         double start_time = 0;
+        double correctY = 22;
 
         //Print correct direction/position
         LCD.Clear();
         LCD.WriteLine("Correct position: (x, y, angle)");
-        //LCD.WriteLine(correctX);
-        //LCD.WriteLine(correctY);
-        LCD.WriteLine(correctD);
+        LCD.WriteLine(correctY);
 
-        //Check direction
-        if (RPS.Heading() < correctD) {
-            start_time = TimeNow();
-            while (RPS.Heading() < correctD || (TimeNow()-start_time)<time) {
-                turnLeft(.3);
-                Sleep(0.4);
-            }
-        }
-        if (RPS.Heading() > correctD || (TimeNow()-start_time)<time) {
-            start_time = TimeNow();
-            while (RPS.Heading() > correctD) {
-                turnRight(.3);
-                Sleep(0.4);
-            }
+        while(RPS.Y() > correctY) {
+            MoveLeft(30);
+            Sleep(.2);
         }
 
-        //Check X
-
-        //Check Y
     }
 
 /*
  * Pick up wrench
  */
     void PickUpWrench() {
+        double time = 5.0;
         servo.SetDegree(80);
-        while (microswitch_arm.Value() == 1){
+        double start_time=TimeNow();
+        while (microswitch_arm.Value() == 1 && (TimeNow()-start_time)<time){
             Reverse(15, .1);
         }
         servo.SetDegree(77);
@@ -340,25 +350,20 @@
    void SpinWheel() {
        int fuel = RPS.FuelType(); //1 clockwise, 2 counter-clockwise
        int i = 65;
-       int i2 = 50;
+       int i2 = 55;
 
 
        //Turn crank
        if (fuel == 1){
-           MoveLeft(20, 1.2);
-           //servo.SetDegree(i);
-           //Sleep(.5);
-           MoveRight(20, .6);
+           MoveLeft(20, 1.1);
            servo.SetDegree(i2);
-           MoveRight(20, 2.0);
+           MoveRight(20, 4.0);
            Forward(30, 1.4);
+           MoveLeft(20, 1.2);
        } else if (fuel == 2) {
-           MoveRight(20, 1.5);
-           //servo.SetDegree(i);
-           //Sleep(.5);
-           MoveLeft(20, .6);
+           MoveRight(20, 1.9);
            servo.SetDegree(i2);
-           MoveLeft(20, 2.0);
+           MoveLeft(20, 4.0);
            Forward(30, 1.4);
        }
        servo.SetDegree(180);
@@ -371,15 +376,15 @@
     void PushButton(){
         int color;
         LCD.WriteLine(CdS_cell.Value());
-        if (CdS_cell.Value() <1) {  //Red Light
+        if (CdS_cell.Value() <.8) {  //Red Light
             LCD.WriteLine("Light is RED");
-            MoveRight(30, .7);
-            Forward(30, .7);
+            MoveRight(30, .6);
+            Forward(30, .6);
             Reverse(30, .6);
-            MoveLeft(30, 2.4);
+            MoveLeft(30, 2.2);
             MoveRight(30, .8);
             Forward(30, .3);
-        } else if(CdS_cell.Value()>1 && CdS_cell.Value()<3.3) { //Blue light
+        } else if(CdS_cell.Value()>.8 && CdS_cell.Value()<3.3) { //Blue light
             LCD.WriteLine("Light is BLUE");
             MoveLeft(30, .6);
             Forward(30, 1.0);
@@ -399,35 +404,41 @@
  * Position function
  */
     void StartRPSPoition () {
-         bool check = true;
-         double correctX = 17.2;
-         double correctY = 28.6;
-         double correctD = 90;
+             bool check = false;
+             double correctX = 17.2;
+             double correctY = 28.6;
+             double correctD = 90;
+             double time = 15.0;
+             double start_time = 0;
+             double difference;
 
-         if(RPS.CurrentRegion() == 6) {
-             correctY = 28.0;
-         }
+             if(RPS.CurrentRegion() == 6) {
+                 correctY = 28.0;
+             }
 
-         LCD.WriteLine("Correct position:");
-         LCD.WriteLine(correctX);
-         LCD.WriteLine(correctY);
-         LCD.WriteLine("-------------");
+             LCD.WriteLine("Correct position:");
+             LCD.WriteLine(correctX);
+             LCD.WriteLine(correctY);
+             LCD.WriteLine("-------------");
 
-         while (check) {
-             LCD.WriteRC(RPS.X(), 2, 12);
-             LCD.WriteRC(RPS.Y(), 3, 12);
-             LCD.WriteRC(RPS.Heading(), 4, 12);
-             if (RPS.X() < (correctX + .2) && RPS.X() > (correctX - .2)) {
-                 if (RPS.Y() < (correctY + .2) && RPS.Y() > (correctY - .2)) {
-                     if (RPS.Heading() < (correctD + .5) && RPS.Heading() > (correctD - .5)) {
-                         LCD.WriteLine("The robot is in the correct position :)");
-                         check = false;
+             start_time = TimeNow();
+             while (!check && (TimeNow()-start_time)<time) {
+                 LCD.WriteRC(60-TimeNow(),6,12);
+                 LCD.WriteRC(RPS.X(), 2, 12);
+                 LCD.WriteRC(RPS.Y(), 3, 12);
+                 LCD.WriteRC(RPS.Heading(), 4, 12);
+                 if (RPS.X() < (correctX + .2) && RPS.X() > (correctX - .2)) {
+                     if (RPS.Y() < (correctY + .2) && RPS.Y() > (correctY - .2)) {
+                         if (RPS.Heading() < (correctD + .5) && RPS.Heading() > (correctD - .5)) {
+                             LCD.WriteLine("The robot is in the correct position :)");
+                             check = true;
+                         }
                      }
                  }
+                 Sleep(3.0);
              }
-             Sleep(3.0);
+
          }
-     }
 
 /*
  * Find Line Function
@@ -447,13 +458,12 @@
 
         //Get to the button, read the button light,
             Forward(26, 2.1);
-            //CheckRPS(90);
             MoveLeft(30, 1.8);
-            Sleep(1.5);
+            Sleep(1.0);
             PushButton();
 
         //Get to and flip the car jack
-            MoveRight(30, 2.1);
+            MoveRight(30, 2.2);
             turnLeft90();
             MoveRight(30, .3);
             Reverse(30, .2);
@@ -470,7 +480,7 @@
             MoveLeft(30, 1.0);
             MoveDiagonalFrontLeft(30, .8);
             FindLine();
-            Forward(20, .9);
+            Forward(20, .5);
             MoveRight(15, .5);
             PickUpWrench();
 
@@ -478,22 +488,21 @@
             //Get up slope
             Forward(30, .6);
             turnRight90();
-            MoveDiagonalBackRight(30, 2.0);
-            MoveLeft(30, .2);
-            Reverse(70, 2.0);
-            MoveLeft(30, 1.0);
-            MoveRight(30, .3);
-            Reverse(60, 1.0);
-            turnRight(1.1);
-            MoveDiagonalBackRight(40, 2.2);
-            turnLeft(.8);
-            MoveRight(30, 1.0);
-            MoveLeft(30, .5);
+            Reverse(30, 1.5);
+            MoveRight(30, 3.0);
+            MoveLeft(30, .15);
+            Reverse(50, 3.5);
+            MoveRight(30, .4);
+            turnRight(1.2);
+            MoveDiagonalBackRight(50, 2.5);
+            turnLeft(1.2);
+            MoveRight(30, 1.8);
+            MoveLeft(30, .3);
 
             //Get to Garage
-            Reverse(30, 2.4);
+            Reverse(30, 2.0);
             turnLeft(1.2);
-            MoveLeft(30, 1.5);
+            MoveLeft(30, 1.1);
             Reverse(30, 1.5);
             Forward(30, .4);
             FindLine();
@@ -531,16 +540,17 @@
             SpinWheel();
 
         //Move to and push final button
-            Forward(30, 1.4);
-            turnRight90();
-            Reverse(30, 3.8);
-            turnRight(1.2);
-            MoveRight(30, 1.5);
-            MoveLeft(30, .2);
-            Reverse(30, 4.5);
-            MoveRight(30, 1.5);
+            Forward(30, 1.2);
+            turnRight(1.1);
+            MoveLeft(30, 3.8);
+            MoveRight(30, .2);
+            Reverse(30, 5.0);
             Forward(30, .2);
-            MoveLeft(30, 2.8);
+            MoveLeft(30, 3.5);
+            CheckRPS();
+            Reverse(30, 1.5);
+            Forward(30, 3.0);
+            turnRight90();
             Forward(30, 8.0);
 
     }
@@ -556,8 +566,14 @@
         //Initialize Servo
         servo.SetDegree(180);
 
+        //Initialize Servo
+        servo.SetDegree(180);
+
         //Initialize the RPS
         RPS.InitializeTouchMenu();
+
+        //Print battery voltage
+        LCD.WriteRC(Battery.Voltage(), 12, 4);
 
         //CheckRPSPoition(16.9, 28.6, 90);
         StartRPSPoition();
