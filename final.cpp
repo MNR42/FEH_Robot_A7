@@ -314,7 +314,7 @@
         //Initialize variables
         double time = 4.0;
         double start_time = 0;
-        double correctY = 22;
+        double correctY = 23;
 
         //Print correct direction/position
         LCD.Clear();
@@ -357,13 +357,13 @@
        if (fuel == 1){
            MoveLeft(20, 1.1);
            servo.SetDegree(i2);
-           MoveRight(20, 4.0);
+           MoveRight(20, 3.0);
            Forward(30, 1.4);
            MoveLeft(20, 1.2);
        } else if (fuel == 2) {
-           MoveRight(20, 1.9);
+           MoveRight(20, 1.7);
            servo.SetDegree(i2);
-           MoveLeft(20, 4.0);
+           MoveLeft(20, 3.0);
            Forward(30, 1.4);
        }
        servo.SetDegree(180);
@@ -410,7 +410,6 @@
              double correctD = 90;
              double time = 15.0;
              double start_time = 0;
-             double difference;
 
              if(RPS.CurrentRegion() == 6) {
                  correctY = 28.0;
@@ -423,7 +422,6 @@
 
              start_time = TimeNow();
              while (!check && (TimeNow()-start_time)<time) {
-                 LCD.WriteRC(60-TimeNow(),6,12);
                  LCD.WriteRC(RPS.X(), 2, 12);
                  LCD.WriteRC(RPS.Y(), 3, 12);
                  LCD.WriteRC(RPS.Heading(), 4, 12);
@@ -488,10 +486,10 @@
             //Get up slope
             Forward(30, .6);
             turnRight90();
-            Reverse(30, 1.5);
+            Reverse(30, 1.3);
             MoveRight(30, 3.0);
             MoveLeft(30, .15);
-            Reverse(50, 3.5);
+            Reverse(50, 3.7);
             MoveRight(30, .4);
             turnRight(1.2);
             MoveDiagonalBackRight(50, 2.5);
@@ -541,12 +539,12 @@
 
         //Move to and push final button
             Forward(30, 1.2);
-            turnRight(1.1);
+            turnRight(.6);
             MoveLeft(30, 3.8);
-            MoveRight(30, .2);
-            Reverse(30, 5.0);
-            Forward(30, .2);
-            MoveLeft(30, 3.5);
+            MoveRight(30, .4);
+            Reverse(50, 3.0);
+            Forward(30, .4);
+            MoveLeft(30, 1.5);
             CheckRPS();
             Reverse(30, 1.5);
             Forward(30, 3.0);
